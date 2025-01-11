@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "puuidmatch")
 public class PuuidMatch {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

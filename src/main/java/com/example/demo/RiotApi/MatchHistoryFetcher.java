@@ -4,19 +4,16 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
 public class MatchHistoryFetcher {
     private static final String MATCH_API_REGION = "europe"; // Adjust based on region
 
-    // Fetch a list of match IDs based on the player's PUUID and desired number of matches
-    public List<String> fetchMatchIds(String puuid, int count) {
+    // Fetch a single match ID based on the player's PUUID and desired number of matches
+    public String fetchMatchIds(String puuid, int count) {
         String endpoint = String.format("https://%s.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?count=%d",
                 MATCH_API_REGION, puuid, count);
-        List<String> matchIds = new ArrayList<>();
 
         try {
             URL url = new URL(endpoint);
@@ -37,15 +34,20 @@ public class MatchHistoryFetcher {
 
                 // Parse the JSON response to extract match IDs
                 JsonArray matchArray = JsonParser.parseString(response.toString()).getAsJsonArray();
-                for (int i = 0; i < matchArray.size(); i++) {
-                    matchIds.add(matchArray.get(i).getAsString());
+
+                // Return the first match ID if available
+                if (matchArray.size() > 0) {
+                    return matchArray.get(0).getAsString(); // Return the first match ID
+                } else {
+                    return null; // No match IDs available
                 }
             } else {
                 System.err.println("Error: " + connection.getResponseCode() + " - " + connection.getResponseMessage());
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return null; // In case of an error, return null
         }
-        return matchIds;
     }
 }
